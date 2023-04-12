@@ -1,5 +1,6 @@
 #pragma once
 #include "parameters.h"
+#include "vlsRandGenerator.h"
 
 /* For simplicity order of adverse events here should be the same as order in the adverse event list enum */
 
@@ -26,5 +27,9 @@ enum vars_list : int
 
 };
 
+// CSV Separator
+static std::string separator = ";";
+
 // Global variable
 extern parameters<double> p;
+extern vlsRandGenerator rnd;

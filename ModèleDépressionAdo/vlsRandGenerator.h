@@ -3,6 +3,11 @@
 #include <mkl.h>
 #include <vector>
 #include <iostream>
+#include <math.h>
+
+// Matrix product of two arrays of size 1, n and n,n
+// outputs a 1, n matrix
+void mmult(double matrix_a[], double matrix_b[], int n, double matrix_c[]);
 
 class vlsRandGenerator
 {
@@ -33,11 +38,14 @@ public:
 	double gompertz(double alpha, double beta);
 	void Many_uniform(double r[], int n);
 
+	void correlated_rnd(double r[], double corr[], int n);
+
 	const static unsigned size = 2000;
 private:
 
 	VSLStreamStatePtr _stream;
 	int _k;
 
+	const double sqr1_2 = 0.707107;
 };
 

@@ -1,5 +1,5 @@
 #include "psy.h"
-#include "vars.h";
+#include "vars.h"
 
 psy::psy() : type(INT_MAX), start(0.0), end(0.0)
 {}

@@ -1,7 +1,7 @@
 #pragma once
 #include "adverse_events.h"
+#include "vlsRandGenerator.h"
 #include "psy.h"
-
 
 class individual
 {
@@ -9,8 +9,13 @@ public:
 	individual();
 	individual(double year, bool male);
 	void history();
+	
 	bool hasAdverseEvent(int type, double when);
 	bool hasPsychiatricDisorder(int type, double when);
+
+	std::string outputAdverseEvent() const;
+	bool isMale() const;
+	double getDate_of_birth() const;
 
 private:
 	void generateAdverseEvents();

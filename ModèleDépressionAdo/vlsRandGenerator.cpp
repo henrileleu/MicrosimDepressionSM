@@ -151,3 +151,32 @@ void vlsRandGenerator::Many_uniform(double _r[], int n)
 	vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, _stream, n, _r, 0, 1);
 
 }
+
+void vlsRandGenerator::correlated_rnd(double r[], double corr[], int n)
+{
+	double result[50];
+
+	// Generate n random normal
+	vdRngGaussian(VSL_RNG_METHOD_UNIFORM_STD, _stream, n, r, 0.0, 1.0);
+
+	// Apply correlation matrix
+	mmult(r, corr, n, result);
+
+	// Transform back to uniform
+	for (int i = 0; i < n; i++) r[i] = 0.5*erfc(-*(result+i) * sqr1_2);
+
+	//delete(result);
+}
+
+void mmult(double matrix_a[], double matrix_b[], int n, double matrix_c[])
+{
+	// initiate the result matrix
+	for (int i = 0; i < n; i++)
+	{
+		*(matrix_c + i) = 0;
+		for (int j = 0; j < n; j++)
+		{
+			*(matrix_c + i) += *(matrix_a + j) * *(matrix_b + j * 3 + i);
+		}
+	}
+}
