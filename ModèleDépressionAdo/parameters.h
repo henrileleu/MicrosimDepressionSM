@@ -3,6 +3,7 @@
 #include <array>
 #include <vector>
 #include <string>
+#include "vars.h"
 
 // Structure to hold parameters
 template <class T> struct param
@@ -18,7 +19,7 @@ template <class T> class parameters
 public:
 	parameters();
 	parameters(std::string path, char c);
-	parameters(std::vector<param<T>>& p);
+	parameters(std::array<param<T>, NumberOfParameters>& p);
 
 	T operator[](size_t i) const;
 	void set(int i, T val);
@@ -34,10 +35,10 @@ private:
 
 	
 	// Vector of parameters
-	std::vector<param<T>> p;
+	std::array<param<T>, NumberOfParameters> p;
 
 	// Vector of mean values
-	std::vector<T> mean_p;
+	std::array<T, NumberOfParameters> mean_p;
 
 	// Initialize mean_p
 	void init();
@@ -59,7 +60,7 @@ private:
 
 
 // Default constructor, fill the mean_param with p value
-template <class T> parameters<T>::parameters() : n(0)
+template <class T> parameters<T>::parameters() : n(0), p()
 {
 }
 
@@ -72,7 +73,7 @@ template <class T> void parameters<T>::init()
 
 	for (size_t i = 0; i < n; i++)
 	{
-		mean_p.push_back(p[i].mean);
+		mean_p[i] = p[i].mean;
 	}
 
 	
@@ -86,7 +87,7 @@ template <class T> parameters<T>::parameters(std::string path, char c) : paramet
 	init();
 }
 
-template <class T> parameters<T>::parameters(std::vector<param<T>>& ext_p) : p(ext_p)
+template <class T> parameters<T>::parameters(std::array<param<T>, NumberOfParameters>& ext_p) : p(ext_p)
 {
 	init();
 }
@@ -216,3 +217,5 @@ template <class T> std::vector<T> parameters<T>::read_data(std::string path, cha
 
 	return array;*/
 }
+
+extern parameters<double> p;

@@ -3,6 +3,8 @@
 #include <vector>
 #include <array>
 #include <string>
+#include "vars.h"
+#include "parameters.h"
 
 enum adverse_events_list : int
 {
@@ -12,27 +14,30 @@ enum adverse_events_list : int
 	Sexual_abuse,
 	Neglect,
 	Bullying,
-	Social_media_use,
 };
 
-const int adverse_event_n = 7;
+const int adverse_event_n = Bullying;
 
 class adverse_events
 {
 public:
 	adverse_events();
 	adverse_events(int type, double start, double end);
+	adverse_events(int type, double start, double end, double frequence, double duration);
 
 	bool has(int type, double when) const;
 	double returnOR(double when) const;
 	int getType() const;
 	double getStart() const;
 	double getEnd() const;
+	double getFrequence() const;
+	double getDuration() const;
+
 	std::string outputAdverseEvent() const;
 
 private:
 	int type;
-	double start, end;
+	double start, end, frequence, duration;
 
 };
 

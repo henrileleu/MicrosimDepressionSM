@@ -1,7 +1,14 @@
 #pragma once
+#include "vars.h"
+#include "parameters.h"
 #include "adverse_events.h"
 #include "vlsRandGenerator.h"
 #include "psy.h"
+#include "socialNetwork.h"
+#include "physicalActivity.h"
+#include "moodDisorder.h"
+#include "anxietyDisorder.h"
+#include "SuicideAttemps.h"
 
 class individual
 {
@@ -10,12 +17,9 @@ public:
 	individual(double year, bool male);
 	void history();
 	
-	bool hasAdverseEvent(int type, double when);
-	bool hasPsychiatricDisorder(int type, double when);
-
+	// Output functions
 	std::string outputAdverseEvent() const;
-	bool isMale() const;
-	double getDate_of_birth() const;
+	std::array < std::string,4> outputAll(long id) const;
 
 private:
 	void generateAdverseEvents();
@@ -23,8 +27,17 @@ private:
 	void generatePsychiatricDisorder();
 
 	double date_of_birth;
+	double age_of_death;
 	bool male;
 	std::vector<adverse_events> adverseEvents;
-	std::vector<psy> psyDisorders;
+	std::vector<psyEpisode> psyDisorder;
+	std::array<SNUsage, numberOfAgeGroups> SNUse;
+	bool physicalActivityData[numberOfAgeGroups];
+	int bullyData[numberOfAgeGroups];
 
+	// Physical Activity Probability used in correlation with SN Use
+	double physicalActivityProbability;
+
+	// Depression Pr used to estimate depression risk between 10 et 18, needs to be here to be used for reverse causation correlation
+	double depressionProbabilites[numberOfAgeGroups];
 };

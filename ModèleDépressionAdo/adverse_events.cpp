@@ -1,10 +1,12 @@
 #include "adverse_events.h"
-#include "vars.h"
 
-adverse_events::adverse_events(): type(INT_MAX), start(0.0), end(0.0)
+adverse_events::adverse_events(): type(INT_MAX), start(0.0), end(0.0), frequence(0.0), duration(0.0)
 {}
 
-adverse_events::adverse_events(int type, double start, double end) : type(type), start(start), end(end)
+adverse_events::adverse_events(int type, double start, double end) : type(type), start(start), end(end), frequence(0.0), duration(0.0)
+{}
+
+adverse_events::adverse_events(int type, double start, double end, double frequence, double duration) : type(type), start(start), end(end), frequence(frequence), duration(duration)
 {}
 
 bool adverse_events::has(int _type, double _when) const
@@ -32,7 +34,17 @@ double adverse_events::getEnd() const
 	return end;
 }
 
+double adverse_events::getFrequence() const
+{
+	return frequence;
+}
+
+double adverse_events::getDuration() const
+{
+	return duration;
+}
+
 std::string adverse_events::outputAdverseEvent() const
 {
-	return std::to_string(type) + separator + std::to_string(start) + separator + std::to_string(end) + "\n";
+	return std::to_string(type) + separator + std::to_string(start) + separator + std::to_string(end);
 }

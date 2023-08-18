@@ -1,13 +1,10 @@
 #include "psy.h"
 #include "vars.h"
 
-psy::psy() : type(INT_MAX), start(0.0), end(0.0)
+psy::psy()
 {}
 
-psy::psy(int type, double start, double end) : type(type), start(start), end(end)
-{}
-
-bool psy::has(int _type, double _when)
+void psy::generateEpisode(double* parameters, double* physicakActivity, int* bullyData, std::vector<adverse_events> adverseEvents, std::array<SNUsage, numberOfAgeGroups> SNUse, std::vector<psyEpisode>& psyDisorder)
 {
-	return (_type == type) && (_when >= start) && (_when < end);
 }
+

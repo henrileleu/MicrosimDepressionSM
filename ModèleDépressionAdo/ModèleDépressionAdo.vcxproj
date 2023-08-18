@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -131,18 +131,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="anxietyDisorder.cpp" />
     <ClCompile Include="ModèleDépressionAdo.cpp" />
+    <ClCompile Include="moodDisorder.cpp" />
     <ClCompile Include="parameters.cpp" />
     <ClCompile Include="individual.cpp" />
     <ClCompile Include="adverse_events.cpp" />
+    <ClCompile Include="physicalActivity.cpp" />
     <ClCompile Include="psy.cpp" />
+    <ClCompile Include="socialNetwork.cpp" />
+    <ClCompile Include="SuicideAttemps.cpp" />
     <ClCompile Include="vlsRandGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adverse_events.h" />
+    <ClInclude Include="anxietyDisorder.h" />
     <ClInclude Include="individual.h" />
+    <ClInclude Include="moodDisorder.h" />
     <ClInclude Include="parameters.h" />
+    <ClInclude Include="physicalActivity.h" />
     <ClInclude Include="psy.h" />
+    <ClInclude Include="socialNetwork.h" />
+    <ClInclude Include="SuicideAttemps.h" />
     <ClInclude Include="vars.h" />
     <ClInclude Include="vlsRandGenerator.h" />
   </ItemGroup>

@@ -1,8 +1,7 @@
 #include "vlsRandGenerator.h"
 
 
-
-vlsRandGenerator::vlsRandGenerator() : _k(-1)
+vlsRandGenerator::vlsRandGenerator() : _k(-1), _stream()
 {
 }
 
@@ -103,6 +102,11 @@ double vlsRandGenerator::normal(double alpha, double sigma) const
 	return _r[0];
 }
 
+void vlsRandGenerator::normal(int n, double* target, double alpha, double sigma) const
+{
+	vdRngGaussian(VSL_RNG_METHOD_UNIFORM_STD, _stream, n, target, alpha, sigma);
+}
+
 double vlsRandGenerator::lognormal(double alpha, double sigma) const
 {
 	double _r[1];
@@ -151,19 +155,35 @@ void vlsRandGenerator::Many_uniform(double _r[], int n)
 	vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, _stream, n, _r, 0, 1);
 
 }
-
+void vlsRandGenerator::normalDist(int n, double* source, double* target)
+{
+	vdCdfNorm(n, source, target);
+}
 void vlsRandGenerator::correlated_rnd(double r[], double corr[], int n)
+{
+	correlated_rnd(r, corr, n, {}, 0);
+}
+void vlsRandGenerator::correlated_rnd(double r[], double corr[], int n, double value[], int m)
 {
 	double result[50];
 
 	// Generate n random normal
 	vdRngGaussian(VSL_RNG_METHOD_UNIFORM_STD, _stream, n, r, 0.0, 1.0);
+	
+	// Transform the probability values in value into normal value using inverse normal 
+	// Add a fixed value to correlated to (always in last positions)
+	if (m != 0)
+	{
+		vdCdfNormInv(m, value, r);
+	}
 
 	// Apply correlation matrix
 	mmult(r, corr, n, result);
 
 	// Transform back to uniform
-	for (int i = 0; i < n; i++) r[i] = 0.5*erfc(-*(result+i) * sqr1_2);
+	//for (int i = 0; i < n; i++) r[i] = 0.5*erfc(-*(result+i) * sqr1_2);
+
+	vdCdfNorm(n, result, r);
 
 	//delete(result);
 }
@@ -176,7 +196,7 @@ void mmult(double matrix_a[], double matrix_b[], int n, double matrix_c[])
 		*(matrix_c + i) = 0;
 		for (int j = 0; j < n; j++)
 		{
-			*(matrix_c + i) += *(matrix_a + j) * *(matrix_b + j * 3 + i);
+			*(matrix_c + i) += *(matrix_a + j) * *(matrix_b + j * n + i);
 		}
 	}
 }
