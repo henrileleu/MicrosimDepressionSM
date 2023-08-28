@@ -4,11 +4,11 @@ SuicideAttemps::SuicideAttemps()
 {
 }
 
-void SuicideAttemps::generateEpisode(std::vector<psyEpisode>& PsyDisorder)
+void SuicideAttemps::generateEpisode(double* param, std::vector<psyEpisode>& PsyDisorder)
 {
 
-    double baseline = 6.5;
-    double suicide_ors[] = { -1.28923264827676, -2.03077636969855, -2.83085763036376 };
+    double baseline = (param[0] == 0.0 ? p[pSuicideAttemps_Baseline_MaleOR] : p[pSuicideAttemps_Baseline_FemaleOR]);
+    double suicide_ors[] = { p[pSuicideAttemps_Depression_OR], p[pSuicideAttemps_GAD_OR], p[pSuicideAttemps_DepressionGAD_OR] };
 
     // Reparse Mood et Anxiety
     bool mood[numberOfAgeGroups] = {};

@@ -44,7 +44,7 @@ double adverse_events::getDuration() const
 	return duration;
 }
 
-std::string adverse_events::outputAdverseEvent() const
+aes adverse_events::outputAdverseEvent() const
 {
-	return std::to_string(type) + separator + std::to_string(start) + separator + std::to_string(end);
+	return aes({ type, start, end });
 }

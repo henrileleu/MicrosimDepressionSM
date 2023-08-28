@@ -38,7 +38,7 @@ void individual::history()
 
 std::string individual::outputAdverseEvent() const
 {
-	if (adverseEvents.empty()) return std::to_string(date_of_birth) + separator + std::to_string(male ? 1 : 2) + ";;;\n";
+	/*if (adverseEvents.empty()) return std::to_string(date_of_birth) + separator + std::to_string(male ? 1 : 2) + ";;;\n";
 	std::string out;
 	for (std::vector<adverse_events>::const_iterator i = adverseEvents.begin(); i != adverseEvents.end(); i++)
 	{
@@ -46,9 +46,12 @@ std::string individual::outputAdverseEvent() const
 	}
 
 	return out;
+	*/
+	return std::string();
+
 }
 
-std::array<std::string, 4> individual::outputAll(long id) const
+void individual::outputAll(long id, std::array < char[outputBufferSize], 4>& buffer) const
 {
 	std::array<std::string, 4> output = {};
 
@@ -59,15 +62,19 @@ std::array<std::string, 4> individual::outputAll(long id) const
 	// - Psy disorder
 
 	// Demographics
-	std::string out = "";
-	out += std::to_string(id) + separator + std::to_string(date_of_birth) + separator + std::to_string(age_of_death) + separator + std::to_string(male ? 1 : 2) + "\n";
-	output[0] = out;
+	sprintf_s(buffer[0], "%x;%.0f;%.2f;%i\n", id, date_of_birth, age_of_death, male ? 1 : 2);
+
+	
 
 	// Adverse Events
-	out = "";
+	bool first(true);
+	char* b(buffer[1]);
+	size_t n(0);
 	for (std::vector<adverse_events>::const_iterator i = adverseEvents.begin(); i != adverseEvents.end(); i++)
 	{
-		out += std::to_string(id) + separator + i->outputAdverseEvent() + "\n";
+		aes AE(i->outputAdverseEvent());
+		n += sprintf_s(b+n, outputBufferSize-n, "%x;%d;%.0f;%.0f\n", first?id:0, AE.type, AE.start, AE.end);
+		first = false;
 	}
 	// PA
 	// Cleaning up by merging similar year;
@@ -78,9 +85,9 @@ std::array<std::string, 4> individual::outputAll(long id) const
 	{
 		if (t != physicalActivityData[i + 1] || i == (numberOfAgeGroups - 1))
 		{
-			out += std::to_string(id) + separator + (t ? "101" : "100") +
-				separator + std::to_string(10 + start) + separator + std::to_string(10 + end) + "\n";
+			n += sprintf_s(b + n, outputBufferSize - n, "%x;%d;%d;%d\n", first ? id : 0, t ? 101 : 100, 10 + start, 10 + end);
 			start = i + 1; end = i + 1; t = physicalActivityData[i + 1];
+			first = false;
 		}
 		else
 		{
@@ -95,37 +102,38 @@ std::array<std::string, 4> individual::outputAll(long id) const
 	{
 		if (t != (bullyData[i + 1]==1) || i == (numberOfAgeGroups - 1))
 		{
-			out += std::to_string(id) + separator + (t ? "201" : "200") +
-				separator + std::to_string(10 + start) + separator + std::to_string(10 + end) + "\n";
+			n += sprintf_s(b + n, outputBufferSize - n, "%x;%d;%d;%d\n", first ? id : 0, t ? 201 : 200, 10 + start, 10 + end);
 			start = i + 1; end = i + 1; t = bullyData[i + 1];
+			first = false;
 		}
 		else
 		{
 			end = i + 1;
 		}
 	}
-	output[1] = out;
+	
+	
 	// SN
-	out = "";
+	first  = true;
+	b = buffer[2];
+	n = 0;
 	for (int i = 0; i < numberOfAgeGroups; i++)
 	{
-		out += std::to_string(id) + separator + std::to_string(10+i) + separator +
-				std::to_string(SNUse[i].n) + separator + std::to_string(SNUse[i].time) + 
-				"\n";
+		n += sprintf_s(b + n, outputBufferSize - n, "%x;%d;%d;%.2f\n", first ? id : 0, i + 10, SNUse[i].n, SNUse[i].time);
+		first = false;
 	}
-	output[2] = out;
-
+	
+	
 	// Psy Disorder
-	out = "";
+	first = true;
+	b = buffer[3];
+	n = 0; 
 	for (std::vector<psyEpisode>::const_iterator i = psyDisorder.begin(); i != psyDisorder.end(); i++)
 	{
-		out += std::to_string(id) + separator + std::to_string(static_cast<int>(i->type)) + separator + std::to_string(10+i->start) + separator + std::to_string(10+i->end) + "\n";
+		n += sprintf_s(b + n, outputBufferSize - n, "%x;%d;%.2f;%.2f\n", first ? id : 0, i->type, 10 + i->start, 10 + i->end);
+		first = false;
 	}
-	output[3] = out;
-
- 	return output;
-
-
+	
 }
 
 /* Function to generate the adverse events during childhood 
@@ -207,7 +215,7 @@ void individual::generateAdverseEvents()
 void individual::generateAdverseEvents(double time)
 {
 	// Variables 
-	double ae_probability(male ? 0.07925 : 0.0645);
+	double ae_probability(male ? p[pBullyingMale] : p[pBullyingFemale]);
 	
 	// Generate corralated rnd values, physical activity is not correlated
 	double r[9];
@@ -227,7 +235,7 @@ void individual::generateAdverseEvents(double time)
 	// Includes changes over time in bullying
 	for (int j = 10; j < 19; j++)
 	{
-		double year(date_of_birth + j);
+		//double year(date_of_birth + j);
 		
 		if (*(r + j - 10) < ae_probability)
 		{
@@ -250,6 +258,6 @@ void individual::generatePsychiatricDisorder()
 
 	// Mood
 	SuicideAttemps generator_c;
-	generator_c.generateEpisode(psyDisorder);
+	generator_c.generateEpisode(param, psyDisorder);
 
 }

@@ -1,28 +1,28 @@
 #include "anxietyDisorder.h"
+#include <iostream>
+#include <fstream>
 
 void anxietyDisorder::generateEpisode(double* parameters, bool* physicakActivity, int* bullyData, std::vector<adverse_events> adverseEvents, std::array<SNUsage, numberOfAgeGroups> SNUse, std::vector<psyEpisode>& psyDisorder)
 {
-	// Use a single risk that reflects individual sensitivity
-	//double anxietyProbability(rnd());
+	// Compute individual sensitivity
+	double anxietyProbability[numberOfAgeGroups] = {};
+	rnd.normal(numberOfAgeGroups, anxietyProbability, p[(parameters[0] == 0 ? pBaselineGAD_male : pBaselineGAD_female)], 1);
 
 	// Parameters = - Ln of OR
-	double adversites_ors[] = { -0.0676586484738149, 0.116533816255952, -0.113328685307003, 0.105360515657826, -0.0198026272961797, -0.46373401623214, -0.048790164169432, 0.0618754037180875, 0.27443684570176 };
-	double SN_ors[] = { -0.357674444271816, -0.636576829071551, -1.18478998490916, 0.0725706928348354, -0.131028262406404, -0.307484699747961 }; // SN
-	double PA_OR = 0.301105;
-	double bullyOR = -0.46373;
+	double adversites_ors[] = { p[pParental_psychopathology_GAD_OR], p[pPhysical_abuse_GAD_OR], p[pEmotional_abuse_GAD_OR], p[pSexual_abuse_GAD_OR],
+		p[pNeglect_GAD_OR], p[pBullying_GAD_OR], p[pAdversities2_GAD_OR], p[pAdversities3_GAD_OR], p[pAdversities4p_GAD_OR] };
+	double SN_ors[] = { p[pSNNumber2_GAD_OR], p[pSNNumber3_GAD_OR], p[pSNNumber5_GAD_OR], p[pSNDuration30_GAD_OR], p[pSNDuration60_GAD_OR], p[pSNDuration120_GAD_OR]}; // SN
+	double PA_OR = p[pPA_GAD_OR];
+	double bullyOR = p[pBullying_GAD_OR];
 
 	/* First compute the baseline risk based on adverseEvents ********/
 	double risk_modifier(0);
-
-	// Baseline
-	double baseline(-0.7);
-	risk_modifier += -baseline;
 
 	// Add COVID
 	bool impactedByCOVID(rnd() < 0.50);
 
 	// Add Demography effect
-	if (parameters[0]==0) risk_modifier += 0.430783;
+	if (parameters[0]==0) risk_modifier += p[pMale_GAD_OR];
 
 	// Add Adversities
 	double number_of_adversities(0);
@@ -40,12 +40,18 @@ void anxietyDisorder::generateEpisode(double* parameters, bool* physicakActivity
 
 	double cte_risk = risk_modifier;
 
+	/*std::ofstream afile;
+    afile.open("C:\\Users\\HenriLeleu\\Downloads\\test.csv", std::ios::app);*/
+
 	/* Run each year, break at first episode, following episode will be based on duration and risk of reccurrence */
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < numberOfAgeGroups; i++)
 	{
 		// Reset constante value
 		risk_modifier = cte_risk;
 
+		// Add baseline
+		risk_modifier += anxietyProbability[i];
+		
 		// Add PA
 		risk_modifier += physicakActivity[i] ? PA_OR : 0;
 
@@ -66,14 +72,16 @@ void anxietyDisorder::generateEpisode(double* parameters, bool* physicakActivity
 		else if (freq > 120)  risk_modifier += SN_ors[5];
 
 		// COVID !
-		double year(10 + i + parameters[1]);
+		/*double year(10 + i + parameters[1]);
 		if (impactedByCOVID && (year >= 2020.0 && year < 2022.0))
 		{
-			risk_modifier += -1.481605;
-		}
+			risk_modifier += p[pCOVID_GAD_OR];
+		}*/
 
 		// Estimate risk
 		risk_modifier = 1 / (1 + exp(risk_modifier));
+
+		//afile << risk_modifier << ",";
 
  		if (rnd() < risk_modifier) {
 			double start(static_cast<double>(i));
@@ -84,5 +92,8 @@ void anxietyDisorder::generateEpisode(double* parameters, bool* physicakActivity
 		}
 
 	}
+
+	/*afile << std::endl;
+	afile.close();*/
 
 }

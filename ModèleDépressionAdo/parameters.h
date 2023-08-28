@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "vars.h"
+#include "vlsRandGenerator.h"
 
 // Structure to hold parameters
 template <class T> struct param
@@ -25,7 +26,7 @@ public:
 	void set(int i, T val);
 	
 	void dsa(int param, bool low);
-	void psa();
+	void psa(vlsRandGenerator& r);
 	void refresh_parameters();
 	
 	size_t getN() const;
@@ -46,10 +47,10 @@ private:
 	// Size
 	size_t n;
 
-	T normal(double mean, double low);
-	T lognormal(double mean, double low);
-	T beta(double mean, double low);
-	T gamma(double mean, double low);
+	T normal(double mean, double low, vlsRandGenerator &r);
+	T lognormal(double mean, double low, vlsRandGenerator& r);
+	T beta(double mean, double low, vlsRandGenerator& r);
+	T gamma(double mean, double low, vlsRandGenerator& r);
 
 	// Functions to read CVS into Vectors
 	std::vector<T> read_data(std::string pathway, char c);
@@ -110,13 +111,13 @@ template <class T> void parameters<T>::dsa(int param, bool low)
 {
 }
 
-template <class T> void parameters<T>::psa()
+template <class T> void parameters<T>::psa(vlsRandGenerator& r)
 {
 	// Do all parameters
 	for (int i = 0; i < n; i++)
 	{
-		//std::cout << i << ": " << p[i][0] << "-";
-		switch (static_cast<int>(p[i][3]))
+		//std::cout << i << ": " << p[i].type;
+		switch (static_cast<int>(p[i].type))
 		{
 		default:
 			//std::cout << "default" << std::endl;
@@ -126,19 +127,19 @@ template <class T> void parameters<T>::psa()
 			//std::cout << "0" << std::endl;
 			break;
 		case 1:
-			mean_p[i] = normal(p[i][0], p[i][1]);
+			mean_p[i] = normal(p[i].mean, p[i].low, r);
 			//std::cout << "1" << std::endl;
 			break;
 		case 2:
-			mean_p[i] = beta(p[i][0], p[i][1]);
+			mean_p[i] = beta(p[i].mean, p[i].low, r);
 			//std::cout << "2" << std::endl;
 			break;
 		case 3:
-			mean_p[i] = gamma(p[i][0], p[i][1]);
+			mean_p[i] = gamma(p[i].mean, p[i].low, r);
 			//std::cout << "3" << std::endl;
 			break;
 		case 4:
-			mean_p[i] = lognormal(p[i][0], p[i][1]);
+			mean_p[i] = lognormal(p[i].mean, p[i].low, r);
 			//std::cout << "4" << std::endl;
 			break;
 		}
@@ -156,37 +157,44 @@ template <class T> size_t parameters<T>::getN() const
 	return n;
 }
 
-template <class T> T parameters<T>::normal(double mean, double low)
+template <class T> T parameters<T>::normal(double mean, double low, vlsRandGenerator& r)
 {
-	/*return rnd_psa.normal(mean, abs(mean - low) / 1.96);*/
+	if (mean == low) return mean;
+	return r.normal(mean, abs(mean - low) / 1.96);
 }
 
-template <class T> T parameters<T>::lognormal(double mean, double low)
+template <class T> T parameters<T>::lognormal(double mean, double low, vlsRandGenerator& r)
 {
-	/*double m(mean);
+	if (mean == low) return mean;
+	bool signbit(mean);
+
+	double m(abs(mean));
 	double s(pow(abs(mean - low) / 1.96, 2));
 	double alpha(log(m) - 0.5 * log(1 + pow(s / m, 2)));
 	double beta(log(1 + pow(s / m, 2)));
-	return rnd_psa.lognormal(alpha, beta);*/
+	return r.lognormal(alpha, beta) * (signbit ? -1.0 : 1.0);
 }
 
-template <class T> T parameters<T>::beta(double mean, double low)
+template <class T> T parameters<T>::beta(double mean, double low, vlsRandGenerator& r)
 {
-	/*double m(mean);
+	if (mean == low) return mean;
+
+	double m(mean);
 	double s(pow(abs(mean - low) / 1.96, 2));
 	double alpha = -m*(s + m * m - m) / s;
 	double beta = (s + m * m - m) * (m - 1) / s;
-	return rnd_psa.betad(alpha, beta);*/
+	return r.betad(alpha, beta);
 
 }
 
-template <class T> T parameters<T>::gamma(double mean, double low)
+template <class T> T parameters<T>::gamma(double mean, double low, vlsRandGenerator& r)
 {
-	/*double m(mean);
+	if (mean == low) return mean;
+	double m(mean);
 	double s(pow(abs(mean - low) / 1.96, 2));
 	double alpha = pow(m,2)/s;
 	double beta = s/m;
-	return rnd_psa.gamma(alpha, beta);*/
+	return r.gamma(alpha, beta);
 }
 
 template <class T> std::vector<T> parameters<T>::read_data(std::string path, char c)

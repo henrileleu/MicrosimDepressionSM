@@ -64,7 +64,7 @@ void socialNetwork::SNProbabilityEstimate(double* SNProbability, double physical
 	double CorrValues[1] = { physicalActivityProbability };
 
 	// Generate Correlation Array
-	double snCorr(0.1);
+	double snCorr(p[pCorrSN]);
 	double a(Corr);
 	double SNProbabilityCorrelation[] =
 	{
@@ -101,14 +101,15 @@ const std::array < SNUsage, numberOfAgeGroups> socialNetwork::generateSNUse(int 
 {
 	std::array<SNUsage, numberOfAgeGroups> results({});
 
-	double corrDepression(1.1);
+	double corrDepression(p[pReverseCausationSNIncrease]);
 
 	// Loop thougth all SN
 	for (int SN = 0; SN < numberOfSN; SN++)
 	{
-		if (SN == 2 || SN == 4 || SN == 5) continue;
+		if (noAddictiveSN && (SN == 2 || SN == 4 || SN == 5)) continue;
+
 		double timeOnSN[numberOfAgeGroups] = {};
-		if (cteTimeProbabilities) timeOnSN[0] = rnd.gamma(6.25, timeSpentOnSN[SN]);
+		if (cteTimeProbabilities) timeOnSN[0] = rnd.gamma(6.25, timeSpentOnSN[SN])*0.9;
 		else  timeOnSN[0] = rnd.gamma(6.25, timeSpentOnSN[SN] * corrDepression);
 		
 
@@ -126,11 +127,37 @@ const std::array < SNUsage, numberOfAgeGroups> socialNetwork::generateSNUse(int 
 
 			// Check if use
 			double pr(SNProbability[index]);
-			bool isUsing(pr < *(getProportionUsers(age, male) + year + SN * 18));
+			bool isUsing(pr < *(getProportionUsers(age, male) + year + SN * 27));
 
 			// If use, then set times
 			results[i].n += (isUsing ? 1 : 0);
 			results[i].time += (isUsing ? timeOnSN[0] : 0);
+		}
+
+	}
+	
+	// Limit to 1h per day max
+	if (Limit1h)
+	{
+		for (int SN = 0; SN < numberOfSN; SN++)
+		{
+			for (size_t i = 0; i < numberOfAgeGroups; i++)
+			{
+				results[i].time = (results[i].time > 1.0 ? 1.0 : results[i].time);
+			}
+		}
+	}
+
+	// Limit to 1h per day max
+	if (intervention)
+	{
+		for (int SN = 0; SN < numberOfSN; SN++)
+		{
+			for (size_t i = 0; i < numberOfAgeGroups; i++)
+			{
+				if (results[i].time > 1.0) results[i].time -= 0.5;
+
+			}
 		}
 	}
 

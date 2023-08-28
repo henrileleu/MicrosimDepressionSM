@@ -20,20 +20,20 @@ void physicalActivity::generatePhysicalActivity(bool * r, double yearOfBirth, bo
 		double reduction(1);
 
 		// COVID 
-		if (y == 2020 || y == 2021) reduction *= 0.5; // 50% reduction during COVID
+		if (y == 2020 || y == 2021) reduction *= p[pPA_COVIDReduction]; // 50% reduction during COVID
 
-		// Add reducing trend, starting in 2014
-		double intervals(y - 2014);
-		if (lowerPA && y > 2014)
+		// Add reducing trend, starting in 2002
+		double intervals(y - 2002);
+		if (lowerPA && y > 2002)
 		{
-			reduction *= pow(0.930888, intervals);
+			reduction *= pow(p[pPA_Decrease], intervals);
 		}
 
 		if (j < 14)
 		{
-			if (physicalActivityProbability < ((male ? 0.337 : 0.202) * reduction) ) r[j] = true;
+			if (physicalActivityProbability < ((male ? p[pPA_Freq10Male] : p[pPA_Freq10Female]) * reduction) ) r[j] = true;
 			continue;
 		}
-		if (physicalActivityProbability < ((male ? 0.401 : 0.157) * reduction) ) r[j] = true;
+		if (physicalActivityProbability < ((male ? p[pPA_Freq14Male] : p[pPA_Freq14Female]) * reduction) ) r[j] = true;
 	}
 }

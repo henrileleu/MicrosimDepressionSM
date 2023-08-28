@@ -18,6 +18,13 @@ enum adverse_events_list : int
 
 const int adverse_event_n = Bullying;
 
+struct aes
+{
+	int type;
+	double start;
+	double end;
+};
+
 class adverse_events
 {
 public:
@@ -33,7 +40,7 @@ public:
 	double getFrequence() const;
 	double getDuration() const;
 
-	std::string outputAdverseEvent() const;
+	aes outputAdverseEvent() const;
 
 private:
 	int type;

@@ -1,5 +1,6 @@
 #pragma once
 #include "vars.h"
+#include "parameters.h"
 
 #ifndef AGEGRVAR
 const static int numberOfAgeGroups = 9;

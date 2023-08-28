@@ -19,7 +19,7 @@ public:
 	
 	// Output functions
 	std::string outputAdverseEvent() const;
-	std::array < std::string,4> outputAll(long id) const;
+	void outputAll(long id, std::array < char[outputBufferSize], 4> &) const;
 
 private:
 	void generateAdverseEvents();

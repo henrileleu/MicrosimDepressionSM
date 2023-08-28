@@ -8,19 +8,22 @@ void moodDisorder::generateEpisode(double* parameters, bool* physicakActivity, i
 	std::vector<psyEpisode> results;
 
 	// Parameters = - Ln of OR
-	double adversites_ors[] = { -0.0861776962410524, 0.127833371509885, -0.285178942233662, -0.0392207131532813, -0.0861776962410524, -0.438254930931155, 0, 0, 0.342490308946776 };
-	double SN_ors[] = { -0.451075619, -0.770108222, -1.124929597, 0.051293294, -0.277631737, -0.182321557 }; // SN
-	double PA_OR = 0.478036;
-	double bullyOR = -0.43825;
+	double adversites_ors[] = { p[pParental_psychopathology_OR], p[pPhysical_abuse_OR], p[pEmotional_abuse_OR], 
+		p[pSexual_abuse_OR], p[pNeglect_OR], p[pBullying_OR], 
+		p[pAdversities2_OR], p[pAdversities3_OR], p[pAdversities4p_OR]};
+
+	double SN_ors[] = { p[pSNNumber2_OR], p[pSNNumber3_OR], p[pSNNumber5_OR], p[pSNDuration30_OR], p[pSNDuration60_OR], p[pSNDuration120_OR]}; // SN
+	double PA_OR = p[pPA_OR];
+	double bullyOR = p[pBullying_OR];
 
 	/* First compute the baseline risk based on adverseEvents ********/
 	double risk_modifier(0);
 
 	// Add Demography effect
-	if (parameters[0]==0.0) risk_modifier += 0.235722334;
-	 
+	if (parameters[0] == 0.0) risk_modifier += p[pMale_OR];
+			 
 	// Add COVID
-	bool impactedByCOVID(rnd() < 0.50);
+	bool impactedByCOVID(rnd() < 0.20);
 
 	// Add Adversities
 	double number_of_adversities(0);
@@ -42,7 +45,7 @@ void moodDisorder::generateEpisode(double* parameters, bool* physicakActivity, i
 	//afile.open("C:\\Users\\HenriLeleu\\Downloads\\test.csv", std::ios::app);
 
 	/* Run each year, break at first episode, following episode will be based on duration and risk of reccurrence */
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < numberOfAgeGroups; i++)
 	{
 		double year(10 + i + parameters[1]);
 
@@ -57,7 +60,7 @@ void moodDisorder::generateEpisode(double* parameters, bool* physicakActivity, i
 		}
 
 		// Add baseline
-		risk_modifier += depressionProbabilites[i];
+		risk_modifier += depressionProbabilites[i] * (1.0 - (parameters[0] == 0 ? -0.20 : 0.08));
 
 		// Add PA
 		risk_modifier += physicakActivity[i] ? PA_OR : 0;
@@ -79,11 +82,11 @@ void moodDisorder::generateEpisode(double* parameters, bool* physicakActivity, i
 		else if (durr > 120)  risk_modifier += SN_ors[5];
 
 		// COVID !
-		/*if (impactedByCOVID && (year >= 2020.0 && year < 2022.0))
+		if (impactedByCOVID && (year == 2020.0 || (year == 2021.0 && rnd() < 0.5)))
 		{
-			risk_modifier += -1.481605;
+			risk_modifier += p[pCOVID_Dep_OR];
 		}
-		*/
+		
 
 		// Estimate risk
 		risk_modifier = 1 / (1 + exp(risk_modifier));
