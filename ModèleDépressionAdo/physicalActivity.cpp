@@ -18,6 +18,7 @@ void physicalActivity::generatePhysicalActivity(bool * r, double yearOfBirth, bo
 	{
 		int y(static_cast<int>(yearOfBirth) + 10 + j);
 		double reduction(1);
+		bool alt(intervention && y >= 2010);
 
 		// COVID 
 		if (y == 2020 || y == 2021) reduction *= p[pPA_COVIDReduction]; // 50% reduction during COVID
@@ -31,9 +32,9 @@ void physicalActivity::generatePhysicalActivity(bool * r, double yearOfBirth, bo
 
 		if (j < 14)
 		{
-			if (physicalActivityProbability < ((male ? p[pPA_Freq10Male] : p[pPA_Freq10Female]) * reduction) ) r[j] = true;
+			if (physicalActivityProbability < ((male ? p[(alt ? pPA_Freq10Male_alt : pPA_Freq10Male)] : p[(alt ? pPA_Freq10Female_alt : pPA_Freq10Female)]) * reduction) ) r[j] = true;
 			continue;
 		}
-		if (physicalActivityProbability < ((male ? p[pPA_Freq14Male] : p[pPA_Freq14Female]) * reduction) ) r[j] = true;
+		if (physicalActivityProbability < ((male ? p[(alt ? pPA_Freq14Male_alt : pPA_Freq14Male)] : p[(alt ? pPA_Freq14Female_alt : pPA_Freq14Female)]) * reduction) ) r[j] = true;
 	}
 }

@@ -70,6 +70,10 @@ enum vars_list : size_t
 	pPA_Freq10Female,
 	pPA_Freq14Male,
 	pPA_Freq14Female,
+	pPA_Freq10Male_alt,
+	pPA_Freq10Female_alt,
+	pPA_Freq14Male_alt,
+	pPA_Freq14Female_alt,
 	pPA_Decrease,
 	pPA_COVIDReduction,
 
@@ -130,3 +134,4 @@ extern bool noAddictiveSN;
 extern bool USVersion;
 extern bool Limit1h;
 extern bool intervention;
+extern bool individual_intervention;

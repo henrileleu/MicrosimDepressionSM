@@ -68,6 +68,17 @@ void moodDisorder::generateEpisode(double* parameters, bool* physicakActivity, i
 		// Add Bully
 		risk_modifier += (bullyData[i]==1) ? bullyOR : 0;
 
+		double durr(SNUse[i].time * 60);
+
+		if (individual_intervention)
+		{
+			double estimated_risk(1 / (1 + exp(risk_modifier)));
+			if (estimated_risk > 0.4)
+			{
+				durr = durr > 30.0 ? 30.0 : durr;
+			}
+		}
+
 		// Add SN
 		// - Frequency
 		double freq(SNUse[i].n);
@@ -76,7 +87,6 @@ void moodDisorder::generateEpisode(double* parameters, bool* physicakActivity, i
 		else if (freq > 6)  risk_modifier += SN_ors[2];
 
 		// - Time
-		double durr(SNUse[i].time*60);
 		if (durr > 30 && durr <= 60)  risk_modifier += SN_ors[3];
 		else if (durr > 60 && durr <= 120)  risk_modifier += SN_ors[4];
 		else if (durr > 120)  risk_modifier += SN_ors[5];

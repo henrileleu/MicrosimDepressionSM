@@ -19,6 +19,8 @@ bool noAddictiveSN;
 bool USVersion;
 bool Limit1h;
 bool intervention;
+bool individual_intervention;
+
 
 int main()
 {
@@ -101,33 +103,29 @@ int main()
     default_p[pBaselineGAD_female] = { 2.10,2.65,2.65,0 };
     default_p[pBaselineGAD_male] = { 2.80, 2.65,2.65,0 };
     default_p[pCOVID_Dep_OR] = { -1.48160454092422,-1.28093384546206,-1.68639895357023,0 };
+    default_p[pPA_Freq10Male_alt] = { 0.741589172663785, 0.593271338131028, 0.889907007196542, 2 };
+    default_p[pPA_Freq10Female_alt] = { 0.666269296938929, 0.533015437551143, 0.799523156326715, 2 };
+    default_p[pPA_Freq14Male_alt] = { 0.771831319725874, 0.617465055780699, 0.926197583671049, 2 };
+    default_p[pPA_Freq14Female_alt] = { 0.633823948037943, 0.507059158430354, 0.760588737645531, 2 };
 
     // Options
     lowerPA = false;
-    Options_ReverseCausation = false;
+    Options_ReverseCausation = true;
     noSN = false;
     noAddictiveSN = false;
     USVersion = false;
     Limit1h = false;
     intervention = false;
+    individual_intervention = true;
 
     // Initiate random number generator
     VSLStreamStatePtr stream;
     vslNewStream(&stream, VSL_BRNG_MT2203, 200882);
     rnd.init(stream);
 
-    if (intervention)
-    {
-        default_p[pPA_Freq10Male] = { 0.741589172663785, 0.593271338131028, 0.889907007196542, 2 };
-        default_p[pPA_Freq10Female] = { 0.666269296938929, 0.533015437551143, 0.799523156326715, 2 };
-        default_p[pPA_Freq14Male] = { 0.771831319725874, 0.617465055780699, 0.926197583671049, 2 };
-        default_p[pPA_Freq14Female] = { 0.633823948037943, 0.507059158430354, 0.760588737645531, 2 };
-
-    }
-
     // Initiate parameters
     p = parameters<double>(default_p);
-
+    
     // Initiate Rnd for PSA
     VSLStreamStatePtr stream_psa;
     vslNewStream(&stream_psa, VSL_BRNG_MT2203, 1082016);
@@ -135,11 +133,11 @@ int main()
     rnd_psa.init(stream_psa);
 
     char fileName[100];
-    for (int i = 0; i < 500; i++) 
+    for (int i = 0; i < 1; i++) 
     {
         vslNewStream(&stream, VSL_BRNG_MT2203, 200882);
         rnd.init(stream);
-        p.psa(rnd_psa);
+        //p.psa(rnd_psa);
 
         // Change some parameters for US
         if (USVersion)
@@ -202,7 +200,7 @@ int main()
     myfile[2].open("C:\\Users\\HenriLeleu\\Downloads\\socialmedia.csv");
     myfile[3].open("C:\\Users\\HenriLeleu\\Downloads\\psydisorder.csv");
 
-    unsigned sample = 10000;
+    unsigned sample = 1000;
     for (double year = 2000.0 - 18.0; year < 2022.0 - 10.0; year++)
     {
         for (unsigned i = 0; i < sample; i++)

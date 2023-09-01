@@ -155,7 +155,9 @@ const std::array < SNUsage, numberOfAgeGroups> socialNetwork::generateSNUse(int 
 		{
 			for (size_t i = 0; i < numberOfAgeGroups; i++)
 			{
-				if (results[i].time > 1.0) results[i].time -= 0.5;
+				size_t age(i + 10);
+				size_t year(yearOfBirth + age);
+				if (year >= 2010 && results[i].time > 1.0) results[i].time -= 0.5;
 
 			}
 		}
