@@ -110,13 +110,13 @@ int main()
 
     // Options
     lowerPA = false;
-    Options_ReverseCausation = true;
+    Options_ReverseCausation = false;
     noSN = false;
     noAddictiveSN = false;
     USVersion = false;
     Limit1h = false;
     intervention = false;
-    individual_intervention = true;
+    individual_intervention = false;
 
     // Initiate random number generator
     VSLStreamStatePtr stream;
@@ -137,7 +137,7 @@ int main()
     {
         vslNewStream(&stream, VSL_BRNG_MT2203, 200882);
         rnd.init(stream);
-        //p.psa(rnd_psa);
+        p.psa(rnd_psa);
 
         // Change some parameters for US
         if (USVersion)

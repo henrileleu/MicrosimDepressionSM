@@ -69,19 +69,21 @@ void moodDisorder::generateEpisode(double* parameters, bool* physicakActivity, i
 		risk_modifier += (bullyData[i]==1) ? bullyOR : 0;
 
 		double durr(SNUse[i].time * 60);
+		double freq(SNUse[i].n);
 
 		if (individual_intervention)
 		{
 			double estimated_risk(1 / (1 + exp(risk_modifier)));
-			if (estimated_risk > 0.4)
+			if (estimated_risk > 0.35)
 			{
-				durr = durr > 30.0 ? 30.0 : durr;
+				durr = 0;
+				freq = 0;
 			}
 		}
-
+		
 		// Add SN
 		// - Frequency
-		double freq(SNUse[i].n);
+
 		if (freq > 2 && freq <= 4)  risk_modifier += SN_ors[0];
 		else if (freq > 4 && freq <= 6)  risk_modifier += SN_ors[1];
 		else if (freq > 6)  risk_modifier += SN_ors[2];
@@ -90,7 +92,7 @@ void moodDisorder::generateEpisode(double* parameters, bool* physicakActivity, i
 		if (durr > 30 && durr <= 60)  risk_modifier += SN_ors[3];
 		else if (durr > 60 && durr <= 120)  risk_modifier += SN_ors[4];
 		else if (durr > 120)  risk_modifier += SN_ors[5];
-
+		
 		// COVID !
 		if (impactedByCOVID && (year == 2020.0 || (year == 2021.0 && rnd() < 0.5)))
 		{
