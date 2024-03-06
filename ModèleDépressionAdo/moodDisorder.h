@@ -6,7 +6,7 @@ class moodDisorder :
 {
 public:
     
-    void generateEpisode(double* parameters, bool* physicakActivity, int* bullyData, std::vector<adverse_events> adverseEvents, std::array<SNUsage, numberOfAgeGroups> SNUse, std::vector<psyEpisode>& psyDisorder, double * depressionProbabilites);
+    void generateEpisode(indCararcteristics& parameters, bool* physicakActivity, int* bullyData, std::vector<adverse_events> adverseEvents, std::array<SNUsage, numberOfAgeGroups> SNUse, std::vector<psyEpisode>& psyDisorder, double * depressionProbabilites);
     
     void subsequentDepressionEpisodes(std::vector<psyEpisode>& results);
 };

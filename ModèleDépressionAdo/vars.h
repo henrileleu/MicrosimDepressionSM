@@ -77,6 +77,38 @@ enum vars_list : size_t
 	pPA_Decrease,
 	pPA_COVIDReduction,
 
+	// Physical Chronic Conditions
+	pObesityMale_a,
+	pObesityMale_b,
+	pObesityFemale_a,
+	pObesityFemale_b,
+	pChronicConditionMale_a,
+	pChronicConditionMale_b,
+	pChronicConditionFemale_a,
+	pChronicConditionFemale_b,
+	pOverweightMale_a,
+	pOverweightMale_b,
+	pOverweightFemale_a,
+	pOverweightFemale_b,
+	pAlcoholMale_a,
+	pAlcoholMale_b,
+	pAlcoholFemale_a,
+	pAlcoholFemale_b,
+	pTabacoMale_a,
+	pTabacoMale_b,
+	pTabacoFemale_a,
+	pTabacoFemale_b,
+	pCannabisMale_a,
+	pCannabisMale_b,
+	pCannabisFemale_a,
+	pCannabisFemale_b,
+	pCannabis_Depression_OR,
+	pTabaco_Depression_OR,
+	pAlcohol_Depression_OR,
+	pOverweight_Depression_OR,
+	pObesity_DepressionMale_OR,
+	pObesity_DepressionFemale_OR,
+	pChronicCondition_Depression_OR,
 
 	// Probabilities of adversities
 	pParental_psychopathology_Pr,
@@ -123,6 +155,18 @@ static std::string separator = ";";
 
 // Global variable
 const static int numberOfAgeGroups = 9;
+
+struct indCararcteristics {
+	bool male;
+	double date_of_birth;
+	bool chronicCondition[numberOfAgeGroups];
+	bool obesity[numberOfAgeGroups];
+	bool overweight[numberOfAgeGroups];
+	bool tabaco[numberOfAgeGroups];
+	bool alcohol[numberOfAgeGroups];
+	bool cannabis[numberOfAgeGroups];
+};
+
 #define AGEGRVAR
 const static size_t outputBufferSize = 1000;
 

@@ -2,11 +2,11 @@
 #include <iostream>
 #include <fstream>
 
-void anxietyDisorder::generateEpisode(double* parameters, bool* physicakActivity, int* bullyData, std::vector<adverse_events> adverseEvents, std::array<SNUsage, numberOfAgeGroups> SNUse, std::vector<psyEpisode>& psyDisorder)
+void anxietyDisorder::generateEpisode(indCararcteristics& parameters, bool* physicakActivity, int* bullyData, std::vector<adverse_events> adverseEvents, std::array<SNUsage, numberOfAgeGroups> SNUse, std::vector<psyEpisode>& psyDisorder)
 {
 	// Compute individual sensitivity
 	double anxietyProbability[numberOfAgeGroups] = {};
-	rnd.normal(numberOfAgeGroups, anxietyProbability, p[(parameters[0] == 0 ? pBaselineGAD_male : pBaselineGAD_female)], 1);
+	rnd.normal(numberOfAgeGroups, anxietyProbability, p[(parameters.male ? pBaselineGAD_male : pBaselineGAD_female)], 1);
 
 	// Parameters = - Ln of OR
 	double adversites_ors[] = { p[pParental_psychopathology_GAD_OR], p[pPhysical_abuse_GAD_OR], p[pEmotional_abuse_GAD_OR], p[pSexual_abuse_GAD_OR],
@@ -22,7 +22,7 @@ void anxietyDisorder::generateEpisode(double* parameters, bool* physicakActivity
 	bool impactedByCOVID(rnd() < 0.50);
 
 	// Add Demography effect
-	if (parameters[0]==0) risk_modifier += p[pMale_GAD_OR];
+	if (parameters.male) risk_modifier += p[pMale_GAD_OR];
 
 	// Add Adversities
 	double number_of_adversities(0);

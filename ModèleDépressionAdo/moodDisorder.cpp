@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 
-void moodDisorder::generateEpisode(double* parameters, bool* physicakActivity, int* bullyData, std::vector<adverse_events> adverseEvents, std::array<SNUsage, numberOfAgeGroups> SNUse, std::vector<psyEpisode>& psyDisorder, double * depressionProbabilites)
+void moodDisorder::generateEpisode(indCararcteristics& parameters, bool* physicakActivity, int* bullyData, std::vector<adverse_events> adverseEvents, std::array<SNUsage, numberOfAgeGroups> SNUse, std::vector<psyEpisode>& psyDisorder, double * depressionProbabilites)
 {
 
 	std::vector<psyEpisode> results;
@@ -15,12 +15,19 @@ void moodDisorder::generateEpisode(double* parameters, bool* physicakActivity, i
 	double SN_ors[] = { p[pSNNumber2_OR], p[pSNNumber3_OR], p[pSNNumber5_OR], p[pSNDuration30_OR], p[pSNDuration60_OR], p[pSNDuration120_OR]}; // SN
 	double PA_OR = p[pPA_OR];
 	double bullyOR = p[pBullying_OR];
+	double CCOR = p[pChronicCondition_Depression_OR];
+	double ObesityOR = p[(parameters.male) ? pObesity_DepressionMale_OR : pObesity_DepressionFemale_OR];
+	double OverweightOR = p[pOverweight_Depression_OR];
+	double AlcoholOR = p[pAlcohol_Depression_OR];
+	double TabacoOR = p[pTabaco_Depression_OR];
+	double CannabisOR = p[pCannabis_Depression_OR];
 
 	/* First compute the baseline risk based on adverseEvents ********/
 	double risk_modifier(0);
 
 	// Add Demography effect
-	if (parameters[0] == 0.0) risk_modifier += p[pMale_OR];
+	// Parameters[0] is sex
+	if (parameters.male) risk_modifier += p[pMale_OR];
 			 
 	// Add COVID
 	bool impactedByCOVID(rnd() < 0.20);
@@ -41,13 +48,44 @@ void moodDisorder::generateEpisode(double* parameters, bool* physicakActivity, i
 
 	double cte_risk = risk_modifier;
 
-	//std::ofstream afile;
-	//afile.open("C:\\Users\\HenriLeleu\\Downloads\\test.csv", std::ios::app);
+	std::ofstream afile;
+	afile.open("C:\\Users\\HenriLeleu\\Downloads\\test.csv", std::ios::app);
 
 	/* Run each year, break at first episode, following episode will be based on duration and risk of reccurrence */
 	for (int i = 0; i < numberOfAgeGroups; i++)
 	{
-		double year(10 + i + parameters[1]);
+		/* Output of Covariables */
+		afile << (parameters.male ? 0.0:1.0) << ",";
+		afile << impactedByCOVID << ",";
+		bool adverseOut[5] = {};
+		for (std::vector<adverse_events>::const_iterator it = adverseEvents.begin();
+			it != adverseEvents.end(); it++)
+		{
+			// different for type
+			adverseOut[it->getType()] = 1;
+		}
+		afile << adverseOut[0] << ",";
+		afile << adverseOut[1] << ",";
+		afile << adverseOut[2] << ",";
+		afile << adverseOut[3] << ",";
+		afile << adverseOut[4] << ",";
+		afile << number_of_adversities << ",";
+		afile << physicakActivity[i] << ",";
+		afile << bullyData[i] << ",";
+		afile << SNUse[i].time << ",";
+		afile << SNUse[i].n << ",";
+		afile << depressionProbabilites[i] << ",";
+		afile << parameters.chronicCondition[i] << ",";
+		afile << parameters.obesity[i] << ",";
+		afile << parameters.overweight[i] << ",";
+		afile << parameters.tabaco[i] << ",";
+		afile << parameters.alcohol[i] << ",";
+		afile << parameters.cannabis[i] << ",";
+
+		/* END */
+
+
+		double year(10 + i + parameters.date_of_birth);
 
 		// Reset constante value
 		risk_modifier = cte_risk;
@@ -60,7 +98,7 @@ void moodDisorder::generateEpisode(double* parameters, bool* physicakActivity, i
 		}
 
 		// Add baseline
-		risk_modifier += depressionProbabilites[i] * (1.0 - (parameters[0] == 0 ? -0.20 : 0.08));
+		risk_modifier += depressionProbabilites[i] * (1.0 - (parameters.male ? -0.20 : 0.08));
 
 		// Add PA
 		risk_modifier += physicakActivity[i] ? PA_OR : 0;
@@ -80,7 +118,23 @@ void moodDisorder::generateEpisode(double* parameters, bool* physicakActivity, i
 				freq = 0;
 			}
 		}
-		
+
+		// Other factors
+		risk_modifier += parameters.chronicCondition[i] ? CCOR : 0;
+		risk_modifier += parameters.obesity[i] ? ObesityOR : 0;
+		risk_modifier += parameters.overweight[i] ? OverweightOR : 0;
+		risk_modifier += parameters.tabaco[i] ? TabacoOR : 0;
+		risk_modifier += parameters.alcohol[i] ? AlcoholOR : 0;
+		risk_modifier += parameters.cannabis[i] ? CannabisOR : 0;
+
+		// COVID !
+		if (impactedByCOVID && (year == 2020.0 || (year == 2021.0 && rnd() < 0.5)))
+		{
+			risk_modifier += p[pCOVID_Dep_OR];
+		}
+
+		double TempRisk_modifier(1 / (1 + exp(risk_modifier)));
+
 		// Add SN
 		// - Frequency
 
@@ -93,17 +147,11 @@ void moodDisorder::generateEpisode(double* parameters, bool* physicakActivity, i
 		else if (durr > 60 && durr <= 120)  risk_modifier += SN_ors[4];
 		else if (durr > 120)  risk_modifier += SN_ors[5];
 		
-		// COVID !
-		if (impactedByCOVID && (year == 2020.0 || (year == 2021.0 && rnd() < 0.5)))
-		{
-			risk_modifier += p[pCOVID_Dep_OR];
-		}
-		
-
 		// Estimate risk
 		risk_modifier = 1 / (1 + exp(risk_modifier));
 
-		//afile << risk_modifier << ",";
+		afile << risk_modifier << ",";
+		afile << TempRisk_modifier << "," << std::endl;
 
 		if (risk_modifier > 0.5) {
 			double start(static_cast<double>(i) + rnd());
@@ -119,8 +167,8 @@ void moodDisorder::generateEpisode(double* parameters, bool* physicakActivity, i
 
 	}
 
-	//afile << std::endl;
-	//afile.close();
+
+	afile.close();
 
 	subsequentDepressionEpisodes(psyDisorder);
 

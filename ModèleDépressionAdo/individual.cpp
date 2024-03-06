@@ -1,10 +1,12 @@
 #include "individual.h"
 
-individual::individual() : date_of_birth(0), male(true), SNUse({}), physicalActivityProbability(0.0), physicalActivityData(), bullyData(), age_of_death(), psyDisorder(), depressionProbabilites()
+individual::individual() : date_of_birth(0), male(true), SNUse({}), physicalActivityProbability(0.0), physicalActivityData(), bullyData(), age_of_death(), psyDisorder(), depressionProbabilites(), 
+chronicCondition(), obesity(), overweight(), tabaco(), alcohol(), cannabis()
 {}
 
 
-individual::individual(double _year, bool _male) : date_of_birth(_year), male(_male), SNUse({}), physicalActivityProbability(rnd()), physicalActivityData(), bullyData(), psyDisorder()
+individual::individual(double _year, bool _male) : date_of_birth(_year), male(_male), SNUse({}), physicalActivityProbability(rnd()), physicalActivityData(), bullyData(), psyDisorder(),
+chronicCondition(), obesity(), overweight(), tabaco(), alcohol(), cannabis()
 {
 	double ln_hr((_year - 2019) * p[pBackgroundMortalityGompertz_year] + male * p[pBackgroundMortalityGompertz_sex]);
 	age_of_death = date_of_birth + rnd.gompertz(p[pBackgroundMortalityGompertz_a], p[pBackgroundMortalityGompertz_b], exp(ln_hr));
@@ -25,6 +27,9 @@ void individual::history()
 	// 3. Adverse events that punctualy affect childhood (only bullying for now)
 	generateAdverseEvents(0.0);
 
+	// 3bis. Chronic Physical Condition, Obesity, Substance Use
+	 
+	
 	// 4. SN Use
 	socialNetwork SNClass = socialNetwork();
 	if (Options_ReverseCausation == false && noSN == false) SNUse = SNClass.getSNUsage(static_cast<int>(date_of_birth), male, physicalActivityProbability);
@@ -246,7 +251,7 @@ void individual::generateAdverseEvents(double time)
 
 void individual::generatePsychiatricDisorder() 
 {
-	double param[] = { male?0.0:1.0, date_of_birth };
+	indCararcteristics param = { male, date_of_birth };
 
 	// Mood
 	moodDisorder generator_a;
@@ -260,4 +265,74 @@ void individual::generatePsychiatricDisorder()
 	SuicideAttemps generator_c;
 	generator_c.generateEpisode(param, psyDisorder);
 
+}
+
+void individual::generateOtherFactors()
+{
+	// Assumes full independance for simplicity at this stage
+	// Fill the arrays for age 10 to 18
+	
+	double EventProbability(0.0);
+	double basetime(date_of_birth+8); // Model starts at age 10, data is for age 12 (3e)
+
+	double prob(rnd());
+
+	// Chronic Pysical Condition
+	double a(male ? p[pChronicConditionMale_a] :p[pChronicConditionFemale_a]);
+	double b(male ? p[pChronicConditionMale_b] :p[pChronicConditionFemale_b]);
+	for (int j = 0; j < numberOfAgeGroups; j++)
+	{
+		EventProbability = a * (basetime + j) + b;
+		chronicCondition[j] = (EventProbability > prob);
+	}
+
+	// Obesity & Overweight; Same prob
+	prob = rnd();
+	a = (male ? p[pObesityMale_a] : p[pObesityFemale_a]);
+	b = (male ? p[pObesityMale_b] : p[pObesityFemale_b]);
+	double a1(male ? p[pOverweightMale_a] : p[pOverweightFemale_a]);
+	double b1(male ? p[pOverweightMale_a] : p[pOverweightFemale_a]);
+	for (int j = 0; j < numberOfAgeGroups; j++)
+	{
+		double p2(prob);
+				
+		EventProbability = a * (basetime + j) + b;
+		obesity[j] = EventProbability > p2;
+
+		p2 -= EventProbability;
+		EventProbability = a1 * (basetime + j) + b1;
+		overweight[j] = (EventProbability > p2);
+	}
+
+	// Alcohol
+	prob = rnd();
+	a = (male ? p[pAlcoholMale_a] : p[pAlcoholFemale_a]);
+	b = (male ? p[pAlcoholMale_b] : p[pAlcoholFemale_b]);
+	std::vector<bool> Alcohol;
+	for (int j = 0; j < numberOfAgeGroups; j++)
+	{
+		EventProbability = a * (basetime + j) + b;
+		alcohol[j] = (EventProbability > prob);
+	}
+
+
+	prob = rnd();
+	a = (male ? p[pTabacoMale_a] : p[pTabacoFemale_a]);
+	b = (male ? p[pTabacoMale_b] : p[pTabacoFemale_b]);
+	std::vector<bool> Tabaco;
+	for (int j = 0; j < numberOfAgeGroups; j++)
+	{
+		EventProbability = a * (basetime + j) + b;
+		tabaco[j] = (EventProbability > prob);
+	}
+
+	prob = rnd();
+	a = (male ? p[pCannabisMale_a] : p[pCannabisFemale_a]);
+	b = (male ? p[pCannabisMale_b] : p[pCannabisFemale_b]);
+	std::vector<bool> Cannabis;
+	for (int j = 0; j < numberOfAgeGroups; j++)
+	{
+		EventProbability = a * (basetime + j) + b;
+		cannabis[j] = (EventProbability > prob);
+	}
 }

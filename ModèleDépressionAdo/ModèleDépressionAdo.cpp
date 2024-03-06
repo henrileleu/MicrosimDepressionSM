@@ -107,6 +107,38 @@ int main()
     default_p[pPA_Freq10Female_alt] = { 0.666269296938929, 0.533015437551143, 0.799523156326715, 2 };
     default_p[pPA_Freq14Male_alt] = { 0.771831319725874, 0.617465055780699, 0.926197583671049, 2 };
     default_p[pPA_Freq14Female_alt] = { 0.633823948037943, 0.507059158430354, 0.760588737645531, 2 };
+    default_p[pObesityMale_a] = { 0.0184249712637903, 0.0184249712637903, 0.0184249712637903, 0 };
+    default_p[pObesityMale_b] = { -40.2424952736282, -40.2424952736282, -40.2424952736282, 0 };
+    default_p[pObesityFemale_a] = { 0.0289139701217571, 0.0289139701217571, 0.0289139701217571, 0 };
+    default_p[pObesityFemale_b] = { -61.2782776766231, -61.2782776766231, -61.2782776766231, 0 };
+    default_p[pChronicConditionMale_a] = { 0.00121643806743669, 0.00121643806743669, 0.00121643806743669, 0 };
+    default_p[pChronicConditionMale_b] = { -2.41389140719746, -2.41389140719746, -2.41389140719746, 0 };
+    default_p[pChronicConditionFemale_a] = { 0.000495036512599704, 0.000495036512599704, 0.000495036512599704, 0 };
+    default_p[pChronicConditionFemale_b] = { -0.969375080829743, -0.969375080829743, -0.969375080829743, 0 };
+    default_p[pOverweightMale_a] = { -0.0015182932855653, -0.0015182932855653, -0.0015182932855653, 0 };
+    default_p[pOverweightMale_b] = { 0.983390568470981, 0.983390568470981, 0.983390568470981, 0 };
+    default_p[pOverweightFemale_a] = { 0.00992647409541568, 0.00992647409541568, 0.00992647409541568, 0 };
+    default_p[pOverweightFemale_b] = { -21.9693540706075, -21.9693540706075, -21.9693540706075, 0 };
+    default_p[pAlcoholMale_a] = { -0.0162922012578616, -0.0162922012578616, -0.0162922012578616, 0 };
+    default_p[pAlcoholMale_b] = { 33.2566894339623, 33.2566894339623, 33.2566894339623, 0 };
+    default_p[pAlcoholFemale_a] = { -0.0136525798525799, -0.0136525798525799, -0.0136525798525799, 0 };
+    default_p[pAlcoholFemale_b] = { 27.6360324324324, 27.6360324324324, 27.6360324324324, 0 };
+    default_p[pTabacoMale_a] = { -0.00813298701298701, -0.00813298701298701, -0.00813298701298701, 0 };
+    default_p[pTabacoMale_b] = { 16.4897828571429, 16.4897828571429, 16.4897828571429, 0 };
+    default_p[pTabacoFemale_a] = { -0.0157877987421384, -0.0157877987421384, -0.0157877987421384, 0 };
+    default_p[pTabacoFemale_b] = { 32.2270705660377, 32.2270705660377, 32.2270705660377, 0 };
+    default_p[pCannabisMale_a] = { -0.00879832923832924, -0.00879832923832924, -0.00879832923832924, 0 };
+    default_p[pCannabisMale_b] = { 17.8098875675676, 17.8098875675676, 17.8098875675676, 0 };
+    default_p[pCannabisFemale_a] = { -0.00609974025974026, -0.00609974025974026, -0.00609974025974026, 0 };
+    default_p[pCannabisFemale_b] = { 12.3673371428571, 12.3673371428571, 12.3673371428571, 0 };
+    default_p[pCannabis_Depression_OR] = { 0.285178942233662, 0.173953307123438, 0.398776119957368, 1 };
+    default_p[pTabaco_Depression_OR] = { 0.593326845277734, 0.207014169384326, 1.04731899428056, 1 };
+    default_p[pAlcohol_Depression_OR] = { 0.431782416425538, 0.173953307123438, 0.693147180559945, 1 };
+    default_p[pOverweight_Depression_OR] = { 0.0392207131532813, -0.0512932943875506, 0.131028262406404, 1 };
+    default_p[pObesity_DepressionMale_OR] = { 0.0769610411361284, -0.162518929497775, 0.314810739840034, 1 };
+    default_p[pObesity_DepressionFemale_OR] = { 0.364643113587909, 0.182321556793955, 0.542324290825362, 1 };
+    default_p[pChronicCondition_Depression_OR] = { 0.385186214231569, 0.162042662917359, 0.567507771025523, 1 };
+
 
     // Options
     lowerPA = false;
@@ -157,7 +189,7 @@ int main()
         sprintf_s(fileName, "C:\\Users\\HenriLeleu\\Downloads\\psydisorder%i.csv", i);
         myfile[3].open(fileName);
 
-        unsigned sample = 10000;
+        unsigned sample = 100;
         for (double year = 2000.0 - 18.0; year < 2022.0 - 10.0; year++)
         {
             for (unsigned i = 0; i < sample; i++)

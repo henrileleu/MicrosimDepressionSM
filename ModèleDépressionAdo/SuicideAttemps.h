@@ -6,7 +6,7 @@ class SuicideAttemps :
 {
 public:
 	SuicideAttemps();
-	void generateEpisode(double * param, std::vector<psyEpisode> &PsyDisorder);
+	void generateEpisode(indCararcteristics& parameters, std::vector<psyEpisode> &PsyDisorder);
 
 private:
 	void reparseEpisodes(bool* episodes, std::vector<psyEpisode> &source, psychatric_disorder);

@@ -25,6 +25,7 @@ private:
 	void generateAdverseEvents();
 	void generateAdverseEvents(double year); // year - 2019
 	void generatePsychiatricDisorder();
+	void generateOtherFactors();
 
 	double date_of_birth;
 	double age_of_death;
@@ -32,6 +33,12 @@ private:
 	std::vector<adverse_events> adverseEvents;
 	std::vector<psyEpisode> psyDisorder;
 	std::array<SNUsage, numberOfAgeGroups> SNUse;
+	bool chronicCondition[numberOfAgeGroups];
+	bool obesity[numberOfAgeGroups];
+	bool overweight[numberOfAgeGroups];
+	bool tabaco[numberOfAgeGroups];
+	bool alcohol[numberOfAgeGroups];
+	bool cannabis[numberOfAgeGroups];
 	bool physicalActivityData[numberOfAgeGroups];
 	int bullyData[numberOfAgeGroups];
 
@@ -41,3 +48,4 @@ private:
 	// Depression Pr used to estimate depression risk between 10 et 18, needs to be here to be used for reverse causation correlation
 	double depressionProbabilites[numberOfAgeGroups];
 };
+

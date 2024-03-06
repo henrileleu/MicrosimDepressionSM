@@ -25,6 +25,6 @@ class psy
 public:
 
 	psy();
-	void generateEpisode(double * parameters, double* physicakActivity, int * bullyData, std::vector<adverse_events> adverseEvents, std::array<SNUsage, numberOfAgeGroups> SNUse, std::vector<psyEpisode> &psyDisorder);
+	void generateEpisode(indCararcteristics& parameters, double* physicakActivity, int * bullyData, std::vector<adverse_events> adverseEvents, std::array<SNUsage, numberOfAgeGroups> SNUse, std::vector<psyEpisode> &psyDisorder);
 
 };
