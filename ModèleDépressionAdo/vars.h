@@ -179,3 +179,4 @@ extern bool USVersion;
 extern bool Limit1h;
 extern bool intervention;
 extern bool individual_intervention;
+extern std::string userFolder;

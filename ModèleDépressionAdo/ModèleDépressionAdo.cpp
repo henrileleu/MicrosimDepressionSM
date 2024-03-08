@@ -9,6 +9,8 @@
 #include "individual.h"
 #include <fstream>
 #include <sstream>
+#include <windows.h>
+#include <shlobj.h>
 
 parameters<double> p;
 vlsRandGenerator rnd;
@@ -20,10 +22,94 @@ bool USVersion;
 bool Limit1h;
 bool intervention;
 bool individual_intervention;
+std::string userFolder;
 
+using namespace std;
+
+std::string GetUserFolder() {
+    wchar_t* widePath;
+    HRESULT hr = SHGetKnownFolderPath(FOLDERID_Profile, 0, NULL, &widePath);
+    if (SUCCEEDED(hr)) {
+        std::wstring userFolder(widePath);
+        CoTaskMemFree(widePath);
+        return std::string(userFolder.begin(), userFolder.end());
+    }
+    else {
+        std::cerr << "Error retrieving user folder path!" << std::endl;
+        return "";
+    }
+}
 
 int main()
 {
+
+    // User folder
+    std::string userFolder = GetUserFolder();
+    if (!userFolder.empty()) {
+        std::cout << L"User folder: " << userFolder << std::endl;
+    }
+
+    // Option menu
+
+    // Options
+    lowerPA = false;
+    Options_ReverseCausation = false;
+    noSN = false;
+    noAddictiveSN = false;
+    USVersion = false;
+    Limit1h = false;
+    intervention = false;
+    individual_intervention = false;
+
+    int choice(-1);
+
+    while (choice == -1) {
+        cout << "Choose an option:" << endl;
+        cout << "0. Basecase" << endl;
+        cout << "1. Reverse Causation" << endl;
+        cout << "2. No Social Networks" << endl;
+        cout << "3. No Addictive Social Networks" << endl;
+        cout << "4. Limit social network to one hour a day" << endl;
+        cout << "5. Intervention" << endl;
+        cout << "6. Individual Intervention" << endl;
+        cout << "7. US" << endl;
+        cout << "8. Exit" << endl;
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 0:
+            break;
+        case 1:
+            Options_ReverseCausation = true;
+            break;
+        case 2:
+            noSN = true;
+            break;
+        case 3:
+            noAddictiveSN = true;
+            break;
+        case 4:
+            Limit1h = true;
+            break;
+        case 5:
+            intervention = true;
+            break;
+        case 6:
+            individual_intervention = true;
+            break;
+        case 7:
+            USVersion = true;
+            break;
+        case 8:
+            cout << "Exiting program..." << endl;
+            return 0;
+        default:
+            cout << "Invalid choice. Please enter a number between 1 and 8." << endl;
+            break;
+        }
+    }
+
     // Parameters are here for now
     std::array<param<double>, NumberOfParameters> default_p({});
     default_p[pParental_psychopathology_Pr] = { 0.437,0.3496,0.5244,2 };
@@ -139,17 +225,6 @@ int main()
     default_p[pObesity_DepressionFemale_OR] = { 0.364643113587909, 0.182321556793955, 0.542324290825362, 1 };
     default_p[pChronicCondition_Depression_OR] = { 0.385186214231569, 0.162042662917359, 0.567507771025523, 1 };
 
-
-    // Options
-    lowerPA = false;
-    Options_ReverseCausation = false;
-    noSN = false;
-    noAddictiveSN = false;
-    USVersion = false;
-    Limit1h = false;
-    intervention = false;
-    individual_intervention = false;
-
     // Initiate random number generator
     VSLStreamStatePtr stream;
     vslNewStream(&stream, VSL_BRNG_MT2203, 200882);
@@ -180,13 +255,13 @@ int main()
 
         std::array< std::ofstream, 4> myfile;
 
-        sprintf_s(fileName, "C:\\Users\\HenriLeleu\\Downloads\\demographics%i.csv", i);
+        sprintf_s(fileName, (userFolder + "\\Downloads\\demographics%i.csv").c_str(), i);
         myfile[0].open(fileName);
-        sprintf_s(fileName, "C:\\Users\\HenriLeleu\\Downloads\\adverseEvents%i.csv", i);
+        sprintf_s(fileName, (userFolder + "\\Downloads\\adverseEvents % i.csv").c_str(), i);
         myfile[1].open(fileName);
-        sprintf_s(fileName, "C:\\Users\\HenriLeleu\\Downloads\\socialmedia%i.csv", i);
+        sprintf_s(fileName, (userFolder + "\\Downloads\\socialmedia % i.csv").c_str(), i);
         myfile[2].open(fileName);
-        sprintf_s(fileName, "C:\\Users\\HenriLeleu\\Downloads\\psydisorder%i.csv", i);
+        sprintf_s(fileName, (userFolder + "\\Downloads\\psydisorder % i.csv").c_str(), i);
         myfile[3].open(fileName);
 
         unsigned sample = 100;
@@ -227,10 +302,10 @@ int main()
     
     std::array< std::ofstream, 4> myfile;
 
-    myfile[0].open("C:\\Users\\HenriLeleu\\Downloads\\demographics.csv");
-    myfile[1].open("C:\\Users\\HenriLeleu\\Downloads\\adverseEvents.csv");
-    myfile[2].open("C:\\Users\\HenriLeleu\\Downloads\\socialmedia.csv");
-    myfile[3].open("C:\\Users\\HenriLeleu\\Downloads\\psydisorder.csv");
+    myfile[0].open((userFolder + "\\Downloads\\demographics.csv").c_str());
+    myfile[1].open((userFolder + "\\Downloads\\adverseEvents.csv").c_str());
+    myfile[2].open((userFolder + "\\Downloads\\socialmedia.csv").c_str());
+    myfile[3].open((userFolder + "\\Downloads\\psydisorder.csv").c_str());
 
     unsigned sample = 1000;
     for (double year = 2000.0 - 18.0; year < 2022.0 - 10.0; year++)

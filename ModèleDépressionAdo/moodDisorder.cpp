@@ -49,7 +49,7 @@ void moodDisorder::generateEpisode(indCararcteristics& parameters, bool* physica
 	double cte_risk = risk_modifier;
 
 	std::ofstream afile;
-	afile.open("C:\\Users\\HenriLeleu\\Downloads\\test.csv", std::ios::app);
+	afile.open((userFolder + "\\Downloads\\test.csv").c_str(), std::ios::app);
 
 	/* Run each year, break at first episode, following episode will be based on duration and risk of reccurrence */
 	for (int i = 0; i < numberOfAgeGroups; i++)
