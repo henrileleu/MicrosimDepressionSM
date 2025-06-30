@@ -21,7 +21,7 @@ const static int numberOfAgeGroups = 9;
 class socialNetwork
 {
 public:
-	const socialNetwork();
+	socialNetwork();
 		
 	// For now the model will just return the number of SN and total average time for a given age
 	const std::array < SNUsage, numberOfAgeGroups> getSNUsage(int yearOfBirth, bool male, double physicalActivityProbability); // Build the SN based on depression risk "mental health might predict heightened social media use in the future"
