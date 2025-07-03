@@ -109,6 +109,8 @@ template <class T> void parameters<T>::parameters::set(int i, T val)
 
 template <class T> void parameters<T>::dsa(int param, bool low)
 {
+	init();
+	mean_p[param] = low ? p[param].low : p[param].high;
 }
 
 template <class T> void parameters<T>::psa(vlsRandGenerator& r)

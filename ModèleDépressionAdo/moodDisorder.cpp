@@ -48,15 +48,15 @@ void moodDisorder::generateEpisode(indCararcteristics& parameters, bool* physica
 
 	double cte_risk = risk_modifier;
 
-	std::ofstream afile;
-	afile.open((userFolder + "\\Downloads\\test.csv").c_str(), std::ios::app);
+	//std::ofstream afile;
+	//afile.open((userFolder + "\\Downloads\\test.csv").c_str(), std::ios::app);
 
 	/* Run each year, break at first episode, following episode will be based on duration and risk of reccurrence */
 	for (int i = 0; i < numberOfAgeGroups; i++)
 	{
 		/* Output of Covariables */
-		afile << (parameters.male ? 0.0:1.0) << ",";
-		afile << impactedByCOVID << ",";
+		//afile << (parameters.male ? 0.0:1.0) << ",";
+		//afile << impactedByCOVID << ",";
 		bool adverseOut[5] = {};
 		for (std::vector<adverse_events>::const_iterator it = adverseEvents.begin();
 			it != adverseEvents.end(); it++)
@@ -64,7 +64,7 @@ void moodDisorder::generateEpisode(indCararcteristics& parameters, bool* physica
 			// different for type
 			adverseOut[it->getType()] = 1;
 		}
-		afile << adverseOut[0] << ",";
+		/*afile << adverseOut[0] << ",";
 		afile << adverseOut[1] << ",";
 		afile << adverseOut[2] << ",";
 		afile << adverseOut[3] << ",";
@@ -80,7 +80,7 @@ void moodDisorder::generateEpisode(indCararcteristics& parameters, bool* physica
 		afile << parameters.overweight[i] << ",";
 		afile << parameters.tabaco[i] << ",";
 		afile << parameters.alcohol[i] << ",";
-		afile << parameters.cannabis[i] << ",";
+		afile << parameters.cannabis[i] << ",";*/
 
 		/* END */
 
@@ -150,8 +150,8 @@ void moodDisorder::generateEpisode(indCararcteristics& parameters, bool* physica
 		// Estimate risk
 		risk_modifier = 1 / (1 + exp(risk_modifier));
 
-		afile << risk_modifier << ",";
-		afile << TempRisk_modifier << "," << std::endl;
+		//afile << risk_modifier << ",";
+		//afile << TempRisk_modifier << "," << std::endl;
 
 		if (risk_modifier > 0.5) {
 			double start(static_cast<double>(i) + rnd());
@@ -168,7 +168,7 @@ void moodDisorder::generateEpisode(indCararcteristics& parameters, bool* physica
 	}
 
 
-	afile.close();
+	//afile.close();
 
 	subsequentDepressionEpisodes(psyDisorder);
 

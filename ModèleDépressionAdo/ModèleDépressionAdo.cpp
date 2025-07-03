@@ -39,6 +39,49 @@ std::string GetUserFolder() {
         return "";
     }
 }
+void run_simulation(std::string userFolder, int i)
+{
+    std::array< std::ofstream, 4> myfile;
+    char fileName[100];
+
+    sprintf_s(fileName, (userFolder + "\\Downloads\\demographics%i.csv").c_str(), i);
+    myfile[0].open(fileName);
+    sprintf_s(fileName, (userFolder + "\\Downloads\\adverseEvents % i.csv").c_str(), i);
+    myfile[1].open(fileName);
+    sprintf_s(fileName, (userFolder + "\\Downloads\\socialmedia % i.csv").c_str(), i);
+    myfile[2].open(fileName);
+    sprintf_s(fileName, (userFolder + "\\Downloads\\psydisorder % i.csv").c_str(), i);
+    myfile[3].open(fileName);
+
+    unsigned sample = 1000;
+    for (double year = 2000.0 - 18.0; year < 2022.0 - 10.0; year++)
+    {
+        for (unsigned i = 0; i < sample; i++)
+        {
+
+            individual ind;
+            ind = individual(year, rnd() < 0.5);
+            ind.history();
+
+            // Get ouputs
+            //std::stringstream stream;
+            //stream << std::hex << static_cast<long>(year) * 100000 + static_cast<long>(i);
+            //std::string id(stream.str());
+            std::array<char[outputBufferSize], 4> buffer;
+            long id(static_cast<long>(year) * 100000 + static_cast<long>(i));
+            ind.outputAll(id, buffer);
+
+            // Write output
+            for (int f = 0; f < 4; f++) {
+                std::string s = buffer[f];
+                myfile[f] << s;
+            }
+
+        }
+    }
+
+    for (int f = 0; f < 4; f++) myfile[f].close();
+}
 
 int main()
 {
@@ -60,6 +103,7 @@ int main()
     Limit1h = false;
     intervention = false;
     individual_intervention = false;
+    bool dsa = false;
 
     int choice(-1);
 
@@ -73,7 +117,8 @@ int main()
         cout << "5. Intervention" << endl;
         cout << "6. Individual Intervention" << endl;
         cout << "7. US" << endl;
-        cout << "8. Exit" << endl;
+        cout << "8. DSA" << endl;
+        cout << "9. Exit" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -102,6 +147,9 @@ int main()
             USVersion = true;
             break;
         case 8:
+            dsa = true;
+            break;
+        case 9:
             cout << "Exiting program..." << endl;
             return 0;
         default:
@@ -129,7 +177,7 @@ int main()
     default_p[pBackgroundMortalityGompertz_year] = { -0.01479,-0.01479,-0.01479,0 };
     default_p[pBackgroundMortalityGompertz_sex] = { -0.065,-0.065,-0.065,0 };
     default_p[pReverseCausationDepIncreaseRate] = { -0.045,-0.045,-0.045,0 };
-    default_p[pBaselineDepressionRisk] = { 1.8,1.8,1.8,0 };
+    default_p[pBaselineDepressionRisk] = { 1.8,1.8*0.8,1.8*1.2,0 };
     default_p[pCorrSN] = { 0.1,0.1,0.1,0 };
     default_p[pReverseCausationSNIncrease] = { 1,1,1,0 };
     default_p[pBullyingMale] = { 0.07925,0.07925,0.07925,2 };
@@ -138,7 +186,7 @@ int main()
     default_p[pPhysical_abuse_OR] = { 0.127833371509885,0.261364764134408,-0.00995033085316809,1 };
     default_p[pEmotional_abuse_OR] = { -0.285178942233662,-0.139761942375159,-0.431782416425538,1 };
     default_p[pSexual_abuse_OR] = { -0.0392207131532813,0.150822889734584,-0.231111720963387,1 };
-    default_p[pNeglect_OR] = { -0.0861776962410524,0.0408219945202552,-0.22314355131421,1 };
+    default_p[pNeglect_OR] = { -0.0861776962410524, -0.0861776962410524, -0.0861776962410524,1 };
     default_p[pBullying_OR] = { -0.438254930931155,-0.300104592450338,-0.570979546585738,1 };
     default_p[pAdversities2_OR] = { 0,0.174353387144778,-0.165514438477573,1 };
     default_p[pAdversities3_OR] = { 0,0.0741079721537218,-0.254642218373581,1 };
@@ -233,70 +281,48 @@ int main()
     // Initiate parameters
     p = parameters<double>(default_p);
     
-    // Initiate Rnd for PSA
-    VSLStreamStatePtr stream_psa;
-    vslNewStream(&stream_psa, VSL_BRNG_MT2203, 1082016);
-    vlsRandGenerator rnd_psa;
-    rnd_psa.init(stream_psa);
-
-    char fileName[100];
-    for (int i = 0; i < 500; i++) 
+    if (!dsa)
     {
-        vslNewStream(&stream, VSL_BRNG_MT2203, 200882);
-        rnd.init(stream);
-        p.psa(rnd_psa);
+        // Initiate Rnd for PSA
+        VSLStreamStatePtr stream_psa;
+        vslNewStream(&stream_psa, VSL_BRNG_MT2203, 1082016);
+        vlsRandGenerator rnd_psa;
+        rnd_psa.init(stream_psa);
 
-        // Change some parameters for US
-        if (USVersion)
+        for (int i = 0; i < 500; i++)
         {
-            p.set(pBaselineDepressionRisk, 1.3);
-            p.set(pCOVID_Dep_OR, 0);
-        }
+            vslNewStream(&stream, VSL_BRNG_MT2203, 200882);
+            rnd.init(stream);
+            p.psa(rnd_psa);
 
-        std::array< std::ofstream, 4> myfile;
-
-        sprintf_s(fileName, (userFolder + "\\Downloads\\demographics%i.csv").c_str(), i);
-        myfile[0].open(fileName);
-        sprintf_s(fileName, (userFolder + "\\Downloads\\adverseEvents % i.csv").c_str(), i);
-        myfile[1].open(fileName);
-        sprintf_s(fileName, (userFolder + "\\Downloads\\socialmedia % i.csv").c_str(), i);
-        myfile[2].open(fileName);
-        sprintf_s(fileName, (userFolder + "\\Downloads\\psydisorder % i.csv").c_str(), i);
-        myfile[3].open(fileName);
-
-        unsigned sample = 1000;
-        for (double year = 2000.0 - 18.0; year < 2022.0 - 10.0; year++)
-        {
-            for (unsigned i = 0; i < sample; i++)
+            // Change some parameters for US
+            if (USVersion)
             {
-
-                individual ind;
-                ind = individual(year, rnd() < 0.5);
-                ind.history();
-
-                // Get ouputs
-                //std::stringstream stream;
-                //stream << std::hex << static_cast<long>(year) * 100000 + static_cast<long>(i);
-                //std::string id(stream.str());
-                std::array<char[outputBufferSize], 4> buffer;
-                long id(static_cast<long>(year) * 100000 + static_cast<long>(i));
-                ind.outputAll(id, buffer);
-
-                // Write output
-                for (int f = 0; f < 4; f++) {
-                    std::string s = buffer[f];
-                    myfile[f] << s;
-                }
-
+                p.set(pBaselineDepressionRisk, 1.3);
+                p.set(pCOVID_Dep_OR, 0);
             }
+
+            run_simulation(userFolder, i);
+
+            std::cout << "Completed: " << i << "\n";
+
+        }
+    }
+
+    if (dsa)
+    {
+        size_t p_size = p.getN();
+        for (int i = 0; i < p_size; i++)
+        {
+            p.dsa(i, true);
+            run_simulation(userFolder, i);
+            p.dsa(i, false);
+            run_simulation(userFolder, i + p_size);
+
+            std::cout << "Completed: " << i << "out of " << p_size << "\n";
         }
 
-        for (int f = 0; f < 4; f++) myfile[f].close();
-
-    
-        std::cout << "Completed: " << i << "\n";
-
-    }
+   }
 
     return 0;
     
